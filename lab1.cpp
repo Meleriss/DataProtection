@@ -25,6 +25,12 @@ long long int generatePrimeNumber (long long min, long long int max) {
     return x;
 }
 
+unsigned long long int gcd (unsigned long long int a, unsigned long long int b) {
+  if (b == 0)
+    return a;
+  return gcd(b, a % b);
+}
+
 unsigned long long int mod_pow(unsigned long long int a, unsigned long long int x, unsigned long long int p) {
     unsigned long long int y = 1;
     while (x)
@@ -105,40 +111,47 @@ void diffyhellman(long long int *Z1, long long int *Z2) {
   *Z2 = Zba;
 }
 
-long long int little_big_step(unsigned long long int a, unsigned long long int p, unsigned long long int y) {
-  long long int x, i=0;
-  long long int m = floor((long long int)sqrt((double)p)) + 1;
-  long long int k = m;
-
-  long long int A[m], B[k];
+ unsigned long long int little_big_step(unsigned long long int a, unsigned long long int p, unsigned long long int y) {
+  unsigned long long int x, i=0, j=0;
+  unsigned long long int m = floor((unsigned long long int)sqrt((double)p)) + 1;
+  unsigned long long int k = m;
+  cout << "m= " << m << "k= "<<k<<endl;
+    unsigned long long int A[m], B[k];
   for(i=0; i<m; i++) {
-    A[i] = (y * (long long int)pow(a, i)) % p;
+    //A[i] = (y * (long long int)pow(a, i)) % p;
+    A[i] = mod_pow(mod_pow(a, i, p) * mod_pow(y, 1, p), 1, p);
+    //cout << A[i] << " ";
   }
-  for(i=1; i<=k; i++) {
-    B[i] = mod_pow(a, i*m, p);
+  cout << endl;
+  for(j=1; j<=k; j++) {
+    B[j] = mod_pow(a, j*m, p);
+    //cout << B[j] << " ";
   }
-
-  map<int,int> dict;
-  for(i=0; i<m; ++i)
+cout << endl;
+  map<unsigned long long int,long long int> dict;
+  for(i=1; i<m; ++i)
     dict[A[i]]=i;
-  for(i=0; i<k; ++i)
+  for(i=1; i<k; ++i)
     if(dict.count(B[i]))
     {
       cout << i << " " << dict[B[i]] << endl;
       x = i * m - dict[B[i]];
       break;
-    }
+    } 
   return x;
-}
+} 
 
 int main()
 {
   srand(time(NULL));
+  long long int p;
   long long int a = rand() % 1000000000;
   long long int x = rand() % 1000000000;
-  long long int p = rand() % 1000000000;
+  do {
+    p = rand() % 1000000000;
+  } while (gcd(a,p) != 1);
   long long int b = rand() % 1000000000;
-  long long int y = rand() % 1000000000;
+  long long int y = rand() % p;
   long long int Zab, Zba, rez;
   int input_menu, input_way;
   cout<<"1.mod_pow"<<endl;
@@ -194,20 +207,18 @@ int main()
         cin>>input_way;
         switch(input_way){
           case 1:
-          cout << y << " " << a << " " << p << endl;
-            cout << little_big_step(y,a,p);
+          cout << "a=" << a << " p=" << p << " y=" << y << endl;
+            cout <<"x="<< little_big_step(a,p,y) << endl;
           break; 
           case 2:
-            cin>>y>>a>>p;
-            cout<<little_big_step(y,a,p);
-          break;  
+            cin>>a>>p>>y;
+            cout<<"x="<< little_big_step(a,p,y) << endl;
+          break;   
           default:
             cout<<"Error!!!!";
           break; 
         } 
-        default:
-           cout<<"Error!!!!";
-        break; 
+      
 
       break;
 
@@ -230,7 +241,7 @@ cout<<rez<<" "<<x<<" "<<y<<endl;
   
   
   
-  /*srand(time(NULL));
+  srand(time(NULL));
  
    unsigned long long int range=1000000000;
 
@@ -238,7 +249,7 @@ cout<<rez<<" "<<x<<" "<<y<<endl;
       x=rand()%range;
     }while(isPrime(x)==false);
     
- cout<<x<<endl;  */
+ cout<<x<<endl;  
   
     
 //system("pause");    */
